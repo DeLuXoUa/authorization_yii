@@ -8,6 +8,7 @@ use yii\web\IdentityInterface;
 class User extends ActiveRecord implements IdentityInterface
 {
 
+    public $repeat_password;
 
     public static function tableName()
     {
@@ -18,7 +19,9 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             [['username', 'password'], 'required'],
-            [['username', 'password'], 'string', 'max' => 20,'min'=>6]
+            [['username', 'password'], 'string', 'max' => 20,'min'=>6],
+            [['username', 'repeat_password'], 'required', 'on'=>'insert'],
+            [['username', 'repeat_password'], 'string', 'min'=>6, 'max'=>20],
         ];
     }
 
@@ -29,7 +32,6 @@ class User extends ActiveRecord implements IdentityInterface
     public static function findIdentity($id)
     {
         return new static(User::findOne($id));
-//        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
     }
 
     /**
@@ -89,15 +91,20 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->password === md5($password);
     }
 
-//
-//    public function beforeSave($insert)
-//    {
-//        if (parent::beforeSave($insert)) {
-//            if ($this->isNewRecord) {
-//                $this->access_token = \Yii::$app->security->generateRandomString();
-//            }
-//            return true;
-//        }
-//        return false;
-//    }
+    public function checkPasses(){
+//        $this->addError('repeat_password', 'Incorrect username or password.');
+        return $this->password === $this->repeat_password;
+    }
+
+
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if ($this->isNewRecord) {
+                $this->access_token = \Yii::$app->security->generateRandomString();
+            }
+            return true;
+        }
+        return false;
+    }
 }

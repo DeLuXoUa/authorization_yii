@@ -21,8 +21,9 @@ class RegisterController extends Controller
     public function actionIndex()
     {
         $model = new User();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post()) && !$model->checkPasses())
+            die('Passwords mismatch');
+        else if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
