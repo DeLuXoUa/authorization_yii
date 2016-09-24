@@ -20,15 +20,19 @@ class RegisterController extends Controller
      */
     public function actionIndex()
     {
-        $model = new User();
-        if ($model->load(Yii::$app->request->post()) && !$model->checkPasses())
-            die('Passwords mismatch');
-        else if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $model = new User(['scenario' => 'insert']);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['success']);
         } else {
             return $this->render('create', [
                 'model' => $model,
             ]);
         }
+    }
+
+    public function actionSuccess()
+    {
+        return $this->render('success');
     }
 }
